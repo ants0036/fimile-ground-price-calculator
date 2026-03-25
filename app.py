@@ -3,11 +3,6 @@ import streamlit as st
 import concurrent.futures
 import requests
 
-file_path = 'test.xlsx' 
-# 0 = first sheet 
-excel_df = pandas.read_excel(file_path, 0)
-test = excel_df.head()
-
 @st.cache_data
 # Given a tracking number, ask the beans API for the package details
 def get_package_details (tracking_number):
@@ -29,6 +24,7 @@ def calculate_weight (tracking_number):
   else: 
     return int(logs[0]["item"]["dimensions"]["dims"][2]["v"])
   
+# calculates one price with one weight 
 def calculate_price (weight):
   if weight == 0: 
     return 0
@@ -59,11 +55,13 @@ def calculate_price (weight):
   else: 
     return 26 
   
+# small function for executor.map to use 
 def price_from_tracking_number (tracking_number):
   weight = calculate_weight(tracking_number)
   price = calculate_price(weight)
   return price
 
+# Using a dataframe of tracking numbers, calculate the prices and return another dataframe with the prices appended to it 
 def calculate_all_prices (tracking_df):
   with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
     tracking_array = tracking_df.iloc[:, 0].values
@@ -77,11 +75,16 @@ def calculate_all_prices (tracking_df):
     return tracking_price_df
 
 tracking_excel = st.file_uploader("drop an excel file here")
-# if file is uploaded to the module 
 if tracking_excel is not None:
   tracking_df = pandas.read_excel(tracking_excel)
   tracking_price_df = calculate_all_prices(tracking_df)
   st.write(tracking_price_df)
+
+# for testing purposes. delete later
+file_path = 'test.xlsx' 
+# 0 = first sheet 
+excel_df = pandas.read_excel(file_path, 0)
+test = excel_df.head()
 
 if st.button("test with data"):
   test_price_df = calculate_all_prices(test)
