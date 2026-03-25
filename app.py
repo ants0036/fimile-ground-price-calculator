@@ -24,36 +24,38 @@ def calculate_weight (tracking_number):
   else: 
     return int(logs[0]["item"]["dimensions"]["dims"][2]["v"])
   
-# calculates one price with one weight 
+# calculates one price with one weight based off of the fimile rate card 
 def calculate_price (weight):
+  base_price = 0
   if weight == 0: 
-    return 0
+    base_price = 0
   elif weight < 31:
-    return 8
+    base_price = 8
   elif weight < 41:
-    return 9
+    base_price = 9
   elif weight < 51:
-    return 10 
+    base_price = 10 
   elif weight < 61: 
-    return 11
+    base_price = 11
   elif weight < 71:
-    return 12
+    base_price = 12
   elif weight < 81:
-    return 13
+    base_price = 13
   elif weight < 91: 
-    return 14
+    base_price = 14
   elif weight < 101: 
-    return 15
+    base_price = 15
   elif weight < 111:
-    return 17
+    base_price = 17
   elif weight < 121:
-    return 19
+    base_price =  19
   elif weight < 131:
-    return 21
+    base_price = 21
   elif weight < 141: 
-    return 23
+    base_price = 23
   else: 
-    return 26 
+    base_price = 26 
+  return base_price + 2
   
 # small function for executor.map to use 
 def price_from_tracking_number (tracking_number):
@@ -79,6 +81,13 @@ if tracking_excel is not None:
   tracking_df = pandas.read_excel(tracking_excel)
   tracking_price_df = calculate_all_prices(tracking_df)
   st.write(tracking_price_df)
+  st.download_button(
+    label="Download excel",
+    data=tracking_price_df,
+    file_name="tracking_and_prices.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    icon=":material/download:",
+)
 
 # for testing purposes. delete later
 file_path = 'test.xlsx' 
