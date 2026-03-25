@@ -1,15 +1,12 @@
-# parse excel file into an array 
 import pandas
 import streamlit as st
 import concurrent.futures
 import requests
 
 file_path = 'test.xlsx' 
-
 # 0 = first sheet 
 excel_df = pandas.read_excel(file_path, 0)
 test = excel_df.head()
-st.write(test) 
 
 @st.cache_data
 # Given a tracking number, ask the beans API for the package details
@@ -67,18 +64,26 @@ def price_from_tracking_number (tracking_number):
   price = calculate_price(weight)
   return price
 
-if st.button("calculate prices"):
-  counter_placeholder = st.empty()
-  # Use ThreadPoolExecutor to run multiple API calls in parallel
+def calculate_all_prices (tracking_df):
   with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-    numbers_array = test.iloc[:, 0].values
+    tracking_array = tracking_df.iloc[:, 0].values
     # map returns results in the same order as input
-    prices = executor.map(price_from_tracking_number, numbers_array)
+    prices = executor.map(price_from_tracking_number, tracking_array)
     tracking_price_dict = {
-      'tracking number' : numbers_array,
+      'tracking number' : tracking_array,
       'prices' : prices
     }
     tracking_price_df = pandas.DataFrame(tracking_price_dict)
-    
-    st.write(tracking_price_df)
+    return tracking_price_df
+
+tracking_excel = st.file_uploader("drop an excel file here")
+# if file is uploaded to the module 
+if tracking_excel is not None:
+  tracking_df = pandas.read_excel(tracking_excel)
+  tracking_price_df = calculate_all_prices(tracking_df)
+  st.write(tracking_price_df)
+
+if st.button("test with data"):
+  test_price_df = calculate_all_prices(test)
+  st.write(test_price_df)
 
