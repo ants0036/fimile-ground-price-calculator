@@ -2,6 +2,7 @@ import pandas
 import streamlit as st
 import concurrent.futures
 import requests
+import io 
 
 @st.cache_data
 # Given a tracking number, ask the beans API for the package details
@@ -81,9 +82,11 @@ if tracking_excel is not None:
   tracking_df = pandas.read_excel(tracking_excel)
   tracking_price_df = calculate_all_prices(tracking_df)
   st.write(tracking_price_df)
+  buffer = io.BytesIO()
+  tracking_price_df.to_excel(buffer)
   st.download_button(
     label="Download excel",
-    data=tracking_price_df,
+    data=buffer,
     file_name="tracking_and_prices.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     icon=":material/download:",
