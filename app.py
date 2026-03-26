@@ -70,6 +70,9 @@ def calculate_all_prices (tracking_df):
     tracking_array = tracking_df.iloc[:, 0].values
     # map returns results in the same order as input
     prices = executor.map(price_from_tracking_number, tracking_array)
+    # todo: add progress tracker?
+    
+    # convert to dict to add to df 
     tracking_price_dict = {
       'tracking number' : tracking_array,
       'prices' : prices
