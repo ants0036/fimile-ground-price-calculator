@@ -62,20 +62,29 @@ def calculate_price (weight):
 def price_from_tracking_number (tracking_number):
   weight = calculate_weight(tracking_number)
   price = calculate_price(weight)
-  return price
+  return [price, weight]
 
 # Using a dataframe of tracking numbers, calculate the prices and return another dataframe with the prices appended to it 
 def calculate_all_prices (tracking_df):
+  counter_placeholder = st.empty()
+  
   with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
     tracking_array = tracking_df.iloc[:, 0].values
+
+    prices = []
+    weights = []
+
     # map returns results in the same order as input
-    prices = executor.map(price_from_tracking_number, tracking_array)
-    # todo: add progress tracker?
-    
+    for package, result in enumerate(executor.map(lambda pkg: price_from_tracking_number(pkg), tracking_array), start=1):
+      prices.append(result[0])
+      weights.append(result[1])
+      counter_placeholder.write(f"Processed: {package}")
+
     # convert to dict to add to df 
     tracking_price_dict = {
       'tracking number' : tracking_array,
-      'prices' : prices
+      'prices' : prices,
+      'weights' : weights
     }
     tracking_price_df = pandas.DataFrame(tracking_price_dict)
     return tracking_price_df
