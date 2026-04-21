@@ -3,6 +3,7 @@ import streamlit as st
 import concurrent.futures
 import requests
 import io 
+import math 
 
 @st.cache_data
 # Given a tracking number, ask the beans API for the package details
@@ -23,7 +24,10 @@ def calculate_weight (tracking_number):
   if logs is None:
     return 0
   else: 
-    return int(logs[0]["item"]["dimensions"]["dims"][2]["v"])
+    dims = logs[0]["item"]["dimensions"]["dims"][0]["v"]
+    split = dims.split("x")
+    return math.prod(split)/250
+
   
 # calculates one price with one weight based off of the fimile rate card 
 def calculate_price (weight):
