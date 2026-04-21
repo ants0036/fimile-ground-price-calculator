@@ -25,7 +25,7 @@ def calculate_weight (tracking_number):
     return 0
   else: 
     dims = logs[0]["item"]["dimensions"]["dims"][0]["v"]
-    split = dims.split("x")
+    split = map(int, dims.split("x"))
     return math.prod(split)/250
 
   
