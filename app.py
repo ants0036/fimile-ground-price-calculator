@@ -27,7 +27,9 @@ def calculate_weight (tracking_number):
     # [3:]: removes first 3 letters from the string 
     dims = logs[0]["item"]["dimensions"]["dims"][0]["v"][3:]
     split = map(int, dims.split("x"))
-    return math.prod(split)/250
+    dimweight = math.prod(split)/250
+    weight = int(logs[0]["item"]["dimensions"]["dims"][2]["v"])
+    return max(dimweight, weight)
 
   
 # calculates one price with one weight based off of the fimile rate card 
