@@ -111,6 +111,17 @@ if tracking_excel is not None:
     icon=":material/download:",
 )
 
+# functionality to look up a single tracking number
+tracking = st.text_input("Tracking Number")
+if st.button("look up tracking number"):
+  price_weight = price_from_tracking_number(tracking)
+  tracking_price_dict = {
+    'tracking number': tracking,
+    'price' : price_weight[0],
+    'weight' : price_weight[1]
+  }
+  st.write(tracking_price_dict)
+
 # for testing purposes. delete later
 file_path = 'test.xlsx' 
 # 0 = first sheet 
@@ -119,5 +130,6 @@ test = excel_df.head()
 
 if st.button("test with data"):
   test_price_df = calculate_all_prices(test)
-  st.write(test_price_df)
+  st.write(test_price_df) 
+
 
