@@ -25,10 +25,10 @@ def calculate_weight (tracking_number):
     return 0
   else: 
     # [3:]: removes first 3 letters from the string 
-    dims = logs[0]["item"]["dimensions"]["dims"][0]["v"][3:]
+    dims = logs[1]["item"]["dimensions"]["dims"][0]["v"][3:]
     split = map(int, dims.split("x"))
     dimweight = math.prod(split)/250
-    weight = int(logs[0]["item"]["dimensions"]["dims"][2]["v"])
+    weight = int(logs[1]["item"]["dimensions"]["dims"][2]["v"])
     return max(dimweight, weight)
 
   
