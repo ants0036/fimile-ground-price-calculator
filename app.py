@@ -29,7 +29,7 @@ def calculate_weight (tracking_number):
     split = map(int, dims.split("x"))
     dimweight = math.prod(split)/250
     weight = int(logs[1]["item"]["dimensions"]["dims"][2]["v"])
-    return max(dimweight, weight)
+    return [dimweight, weight, max(dimweight, weight)]
 
   
 # calculates one price with one weight based off of the fimile rate card 
@@ -67,9 +67,9 @@ def calculate_price (weight):
   
 # small function for executor.map to use 
 def price_from_tracking_number (tracking_number):
-  weight = calculate_weight(tracking_number)
+  dimweight, weight, max = calculate_weight(tracking_number)
   price = calculate_price(weight)
-  return [price, weight]
+  return [price, dimweight, weight, max]
 
 # Using a dataframe of tracking numbers, calculate the prices and return another dataframe with the prices appended to it 
 def calculate_all_prices (tracking_df):
@@ -79,19 +79,25 @@ def calculate_all_prices (tracking_df):
     tracking_array = tracking_df.iloc[:, 0].values
 
     prices = []
+    dimweights = []
     weights = []
+    max = []
 
     # map returns results in the same order as input
     for package, result in enumerate(executor.map(lambda pkg: price_from_tracking_number(pkg), tracking_array), start=1):
       prices.append(result[0])
-      weights.append(result[1])
+      dimweights.append(result[1])
+      weights.append(result[2])
+      max.append(result[3])
       counter_placeholder.write(f"Processed: {package}")
 
     # convert to dict to add to df 
     tracking_price_dict = {
       'tracking number' : tracking_array,
       'prices' : prices,
-      'weights' : weights
+      'dimweights' : dimweights,
+      'weights' : weights,
+      'max' : max
     }
     tracking_price_df = pandas.DataFrame(tracking_price_dict)
     return tracking_price_df
@@ -118,7 +124,9 @@ if st.button("look up tracking number"):
   tracking_price_dict = {
     'tracking number': tracking,
     'price' : price_weight[0],
-    'weight' : price_weight[1]
+    'dimweight' : price_weight[1],
+    'weight' : price_weight[2],
+    'max' : price_weight[3]
   }
   st.write(tracking_price_dict)
 
